@@ -11,7 +11,7 @@ add_executable(${PROJECT_NAME}
 
 add_subdirectory(third_party)
 
-target_link_libraries(${PROJECT_NAME} fmt::fmt dpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt dpp)
 
 target_link_libraries(${PROJECT_NAME}
     ${DPP_LIBRARIES}
@@ -21,7 +21,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${DPP_INCLUDE_DIR}
 )
 
-# set_target_properties(${PROJECT_NAME} PROPERTIES
-#     CXX_STANDARD 21
-#     CXX_STANDARD_REQUIRED ON
-# )
+target_compile_options(${PROJECT_NAME} PUBLIC -fexceptions -Wall -pedantic -O3 -march=native)
+target_compile_options(fmt PUBLIC -fexceptions -O3 -march=native)
+target_compile_options(dpp PUBLIC -fexceptions -O3 -march=native)
