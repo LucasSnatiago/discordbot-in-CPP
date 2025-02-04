@@ -1,16 +1,41 @@
 #include <dpp/dpp.h>
 #include <fmt/core.h>
 
+extern "C" {
+  #include <sqlite3.h>
+}
+
 #include <cstdlib>
 #include <thread>
 
+#include <env/env.hpp>
+
 int main() {
-  if (std::getenv("BOT_TOKEN") == nullptr) {
+  std::string bot_token;
+
+  // Get from enviroment variable
+  if (std::getenv("BOT_TOKEN") != nullptr) {
+    bot_token = std::getenv("BOT_TOKEN");
+
+  // Get from .env file
+  } else if (envFileExists(".token")) {
+    bot_token = envFileContent(".token");
+
+  // Failed to get bot token
+  } else {
     fmt::println("Please provide bot token as a env variable: BOT_TOKEN");
-    return 1;
+    exit(1);
   }
 
-  std::string bot_token(std::getenv("BOT_TOKEN"));
+  sqlite3 *db;
+  if (sqlite3_open("test.db", &db)) {
+    fmt::println("error opening db");
+    exit(2);
+  }
+
+  sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS teste (id INTEGER PRIMARY KEY AUTOINCREMENT);", nullptr, NULL, NULL);
+  sqlite3_close(db);
+
   dpp::cluster bot(bot_token, dpp::i_all_intents);
 
   bot.on_log(dpp::utility::cout_logger());
